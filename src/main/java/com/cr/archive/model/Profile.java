@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 public class Profile {
 
     private String tag;
+    private String name;
+    private String clan;
     private Map<String, String> chestsQueue = new LinkedHashMap<>();
     private List<Object> cardSet = new ArrayList<>();
     private static Map<String, String> cardsRarity = new HashMap<String, String>(){{
@@ -100,6 +102,7 @@ public class Profile {
         put("Mega+Knight", "legendary");
         put("Magic+Archer", "legendary");
         put("Barbarian+Barrel", "epic");
+        put("Rascals", "common");
     }};
 
     public Profile(String tag) {
@@ -107,8 +110,25 @@ public class Profile {
         initProfile();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getClan() {
+        return clan;
+    }
+
+    public void setClan(String clan) {
+        this.clan = clan;
+    }
+
     private void initProfile() {
         String profile = HttpUtil.get(this.tag);
+        System.out.println("profile==" + profile);
 
         String pattern = "<span class=\"chests__counter\">[\\s\\S]*?</div>";
         Pattern r = Pattern.compile(pattern);
@@ -124,6 +144,18 @@ public class Profile {
             }
         }
         initCards(this.tag);
+        String namePattern = "(?<=(<span class=\"profileHeader__nameCaption\">))[\\s\\S]*?(?=</span>)";
+        Pattern r1 = Pattern.compile(namePattern);
+        Matcher m1 = r1.matcher(profile);
+        while (m1.find()){
+            this.name = m1.group().trim();
+        }
+        String clanPattern = "(?<=(class=\"profileHeader__clanBadge\" />))[\\s\\S]*?(?=</a>)";
+        Pattern r2 = Pattern.compile(clanPattern);
+        Matcher m2 = r2.matcher(profile);
+        while (m2.find()){
+            this.clan = m2.group().trim();
+        }
     }
 
     private void initCards(String tag) {
@@ -196,8 +228,8 @@ public class Profile {
     }
 
     public static void main(String[] args) {
-        //Profile p = new Profile("82UYLC9J");
-        Profile p = new Profile("2vpjvclc");
+        Profile p = new Profile("82UYLC9J");
+        //Profile p = new Profile("2vpjvclc");
         //System.out.println(p.cardsRarity.size());
         int common = 0;
         int rare =0;
@@ -227,46 +259,52 @@ public class Profile {
         int legRemainNum = 0;
         int legRemainExp = 0;
         int legRemainGold = 0;
+        String comCardsInfo = "";
+        String rareCardsinfo = "";
+        String epicCardsInfo = "";
+        String legCardsInfo = "";
 
-        for (Object o : p.cardSet) {
+        for (Object o : p.getCardSet()) {
             if (o instanceof Common){
                 Common card = (Common) o;
-                    common++;
-
-
+                common++;
                 commonCurNum += card.getCurrentGross();
                 commonCurGold += card.getCurrentGold();
                 commonCurExp += card.getCurrentExp();
                 commonRemainNum += card.getRemainGross();
                 commonRemainGold += card.getRemainGold();
                 commonRemainExp += card.getRemainExp();
+                comCardsInfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
             }else if (o instanceof Rare){
                 Rare card = (Rare) o;
-                    rare++;
+                rare++;
                 rareCurNum += card.getCurrentGross();
                 rareCurGold += card.getCurrentGold();
                 rareCurExp += card.getCurrentExp();
                 rareRemainNum += card.getRemainGross();
                 rareRemainGold += card.getRemainGold();
                 rareRemainExp += card.getRemainExp();
-            }else if (o instanceof Epic) {
+                rareCardsinfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
+            }else if (o instanceof Epic){
                 Epic card = (Epic) o;
-                    epic++;
+                epic++;
                 epicCurNum += card.getCurrentGross();
                 epicCurGold += card.getCurrentGold();
                 epicCurExp += card.getCurrentExp();
                 epicRemainNum += card.getRemainGross();
                 epicRemainGold += card.getRemainGold();
                 epicRemainExp += card.getRemainExp();
+                epicCardsInfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
             }else if (o instanceof Legendary){
                 Legendary card = (Legendary) o;
-                    legendary++;
+                legendary++;
                 legCurNum += card.getCurrentGross();
                 legCurGold += card.getCurrentGold();
                 legCurExp += card.getCurrentExp();
                 legRemainNum += card.getRemainGross();
                 legRemainGold += card.getRemainGold();
                 legRemainExp += card.getRemainExp();
+                legCardsInfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
             }
         }
         int totalNum = commonCurNum + rareCurNum + epicCurNum + legCurNum;
@@ -275,25 +313,31 @@ public class Profile {
         int totalRemainNum = commonRemainNum + rareRemainNum + epicRemainNum + legRemainNum;
         int totalRemainGold = commonRemainGold + rareRemainGold + epicRemainGold + epicRemainGold;
         int totalRemainExp = commonRemainExp + rareRemainExp + epicRemainExp + legRemainExp;
-        System.out.println("common:" + common);
-        System.out.println("common number:" + commonCurNum);
-        System.out.println("common extra number:" + commonRemainNum);
-        System.out.println("common extra gold:" + commonRemainGold);
-        System.out.println("rare:" + rare);
-        System.out.println("rare number:" + rareCurNum);
-        System.out.println("rare extra number:" + rareRemainNum);
-        System.out.println("rare extra gold:" + rareRemainGold);
-        System.out.println("epic:" + epic);
-        System.out.println("epic number:" + epicCurNum);
-        System.out.println("epic extra number:" + epicRemainNum);
-        System.out.println("epic extra gold:" + epicRemainGold);
-        System.out.println("legendary:" + legendary);
-        System.out.println("legendary number:" + legCurNum);
-        System.out.println("legendary extra number:" + legRemainNum);
-        System.out.println("legendary extra gold:" + legRemainGold);
-        System.out.println("total card number:" + totalNum);
-        System.out.println("total extra card number:" + totalRemainNum);
-        System.out.println("total extra gold:" + totalRemainGold);
-        System.out.println("total extra Exp:" + totalRemainExp);
+        StringBuilder s = new StringBuilder();
+        s.append("common:" + common + "<br/>");
+        s.append(comCardsInfo);
+        s.append("common number:" + commonCurNum + "<br/>");
+        s.append("common extra number:" + commonRemainNum + "<br/>");
+        s.append("common extra gold:" + commonRemainGold + "<br/>");
+        s.append("rare:" + rare + "<br/>");
+        s.append(rareCardsinfo);
+        s.append("rare number:" + rareCurNum + "<br/>");
+        s.append("rare extra number:" + rareRemainNum + "<br/>");
+        s.append("rare extra gold:" + rareRemainGold + "<br/>");
+        s.append("epic:" + epic + "<br/>");
+        s.append(epicCardsInfo);
+        s.append("epic number:" + epicCurNum + "<br/>");
+        s.append("epic extra number:" + epicRemainNum + "<br/>");
+        s.append("epic extra gold:" + epicRemainGold + "<br/>");
+        s.append("legendary:" + legendary + "<br/>");
+        s.append(legCardsInfo);
+        s.append("legendary number:" + legCurNum + "<br/>");
+        s.append("legendary extra number:" + legRemainNum + "<br/>");
+        s.append("legendary extra gold:" + legRemainGold + "<br/>");
+        s.append("total card number:" + totalNum + "<br/>");
+        s.append("total extra card number:" + totalRemainNum + "<br/>");
+        s.append("total extra gold:" + totalRemainGold + "<br/>");
+        s.append("total extra Exp:" + totalRemainExp + "<br/>");
+        System.out.println(s.toString());
     }
 }

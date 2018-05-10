@@ -21,38 +21,46 @@ import java.util.Map;
 @EnableAutoConfiguration
 public class DemoApplication {
 
+	@RequestMapping(value = "/", produces = "text/plain;charset=UTF-8")
+		//@ResponseBody
+	ModelAndView home() {
+		ModelAndView modelAndView = new ModelAndView("index");
+		return modelAndView;
+	}
 
 	@RequestMapping(value = "/profile", produces = "text/plain;charset=UTF-8")
 	//@ResponseBody
-	ModelAndView home() {
-		ModelAndView modelAndView = new ModelAndView("index");
-		//Profile p = new Profile(tag);
-		Profile p1 = new Profile("82UYLC9J");
-		Profile p2 = new Profile("2vpjvclc");
-		String text = "Hello 无尽星空" + "<br/>";
-		int i = 0;
-		for (Map.Entry<String, String> entry: p1.getChestsQueue().entrySet()){
-			text += entry.getKey() + "==" + entry.getValue() + "<br/>";
-			i++;
+	ModelAndView profile(String tag) {
+		ModelAndView modelAndView = new ModelAndView("profile");
+		Profile p = new Profile(tag);
+//		Profile p1 = new Profile("82UYLC9J");
+//		Profile p2 = new Profile("2vpjvclc");
+		String name = "Hello " + p.getName() + "  " + p.getClan();
+
+		modelAndView.addObject("p", name);
+
+		//chests queue
+		String queue = "";
+		for (Map.Entry<String, String> entry: p.getChestsQueue().entrySet()){
+			queue += "<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>";
 		}
-		while ( i < 15 ) {
-			text += "<br/>";
-			i++;
-		}
-		text += addCardInfo(p1);
-		modelAndView.addObject("p1", text);
-		text = "Hello 暗影奇袭" + "<br/>";
-		i = 0;
-		for (Map.Entry<String, String> entry: p2.getChestsQueue().entrySet()){
-			text += entry.getKey() + "==" + entry.getValue() + "<br/>";
-			i++;
-		}
-		while ( i < 15 ) {
-			text += "<br/>";
-			i++;
-		}
-		text += addCardInfo(p2);
-		modelAndView.addObject("p2", text);
+		modelAndView.addObject("queue", queue);
+
+		modelAndView.addObject("cardInfo", addCardInfo(p));
+
+
+//		text = "Hello 暗影奇袭" + "<br/>";
+//		i = 0;
+//		for (Map.Entry<String, String> entry: p2.getChestsQueue().entrySet()){
+//			text += entry.getKey() + "==" + entry.getValue() + "<br/>";
+//			i++;
+//		}
+//		while ( i < 15 ) {
+//			text += "<br/>";
+//			i++;
+//		}
+//		text += addCardInfo(p2);
+//		modelAndView.addObject("p2", text);
 		return modelAndView;
 	}
 
@@ -100,7 +108,7 @@ public class DemoApplication {
 				commonRemainNum += card.getRemainGross();
 				commonRemainGold += card.getRemainGold();
 				commonRemainExp += card.getRemainExp();
-				comCardsInfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
+				comCardsInfo += "<tr><td><img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"48\" width=\"40\">" + "</td><td style=\"vertical-align:middle\">" + card.level + "</td><td style=\"vertical-align:middle\">" + card.getCurrentGross() + "</td><td style=\"vertical-align:middle\">" + card.getRemainGross()+ "</td></tr>";
 			}else if (o instanceof Rare){
 				Rare card = (Rare) o;
 					rare++;
@@ -110,7 +118,7 @@ public class DemoApplication {
 				rareRemainNum += card.getRemainGross();
 				rareRemainGold += card.getRemainGold();
 				rareRemainExp += card.getRemainExp();
-				rareCardsinfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
+				rareCardsinfo += "<tr><td><img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"48\" width=\"40\">" + "</td><td style=\"vertical-align:middle\">" + card.level + "</td><td style=\"vertical-align:middle\">" + card.getCurrentGross() + "</td><td style=\"vertical-align:middle\">" + card.getRemainGross()+ "</td></tr>";
 			}else if (o instanceof Epic){
 				Epic card = (Epic) o;
 					epic++;
@@ -120,7 +128,7 @@ public class DemoApplication {
 				epicRemainNum += card.getRemainGross();
 				epicRemainGold += card.getRemainGold();
 				epicRemainExp += card.getRemainExp();
-				epicCardsInfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
+				epicCardsInfo += "<tr><td><img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"48\" width=\"40\">" + "</td><td style=\"vertical-align:middle\">" + card.level + "</td><td style=\"vertical-align:middle\">" + card.getCurrentGross() + "</td><td style=\"vertical-align:middle\">" + card.getRemainGross()+ "</td></tr>";
 			}else if (o instanceof Legendary){
 				Legendary card = (Legendary) o;
 					legendary++;
@@ -130,7 +138,7 @@ public class DemoApplication {
 				legRemainNum += card.getRemainGross();
 				legRemainGold += card.getRemainGold();
 				legRemainExp += card.getRemainExp();
-				legCardsInfo += "<img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"30\" width=\"25\">" + "Level:" + card.level + ", Number:" + card.getCurrentGross() + "<br/>";
+				legCardsInfo += "<tr><td><img src=\"https://statsroyale.com/images/cards/full/" +card.imgUrl + "\" height=\"48\" width=\"40\">" + "</td><td style=\"vertical-align:middle\">" + card.level + "</td><td style=\"vertical-align:middle\">" + card.getCurrentGross() + "</td><td style=\"vertical-align:middle\">" + card.getRemainGross()+ "</td></tr>";
 			}
 		}
 		int totalNum = commonCurNum + rareCurNum + epicCurNum + legCurNum;
@@ -140,30 +148,29 @@ public class DemoApplication {
 		int totalRemainGold = commonRemainGold + rareRemainGold + epicRemainGold + epicRemainGold;
 		int totalRemainExp = commonRemainExp + rareRemainExp + epicRemainExp + legRemainExp;
 		StringBuilder s = new StringBuilder();
-		s.append("common:" + common + "<br/>");
+		s.append("<tr><td>Common cards:" + common + "</td><th>Level</th><th>Owned</th><th>Missing</th></tr>");
 		s.append(comCardsInfo);
-		s.append("common number:" + commonCurNum + "<br/>");
-		s.append("common extra number:" + commonRemainNum + "<br/>");
-		s.append("common extra gold:" + commonRemainGold + "<br/>");
-		s.append("rare:" + rare + "<br/>");
+		s.append("<tr><td>Common cards number:" + commonCurNum + "</td></tr>");
+		s.append("<tr><td>Common cards needed:" + commonRemainNum + "</td></tr>");
+		s.append("<tr><td>Upgrade common cards coin needed:" + commonRemainGold + "</td></tr>");
+		s.append("<tr><td>Rare cards:" + rare + "</td><th>Level</th><th>Owned</th><th>Missing</th></tr>");
 		s.append(rareCardsinfo);
-		s.append("rare number:" + rareCurNum + "<br/>");
-		s.append("rare extra number:" + rareRemainNum + "<br/>");
-		s.append("rare extra gold:" + rareRemainGold + "<br/>");
-		s.append("epic:" + epic + "<br/>");
+		s.append("<tr><td>Rare cards number:" + rareCurNum + "</td></tr>");
+		s.append("<tr><td>Rare cards needed:" + rareRemainNum + "</td></tr>");
+		s.append("<tr><td>Upgrade rare cards coin needed:" + rareRemainGold + "</td></tr>");
+		s.append("<tr><td>Epic cards:" + epic + "</td><th>Level</th><th>Owned</th><th>Missing</th></tr>");
 		s.append(epicCardsInfo);
-		s.append("epic number:" + epicCurNum + "<br/>");
-		s.append("epic extra number:" + epicRemainNum + "<br/>");
-		s.append("epic extra gold:" + epicRemainGold + "<br/>");
-		s.append("legendary:" + legendary + "<br/>");
+		s.append("<tr><td>Epic cards number:" + epicCurNum + "</td></tr>");
+		s.append("<tr><td>Epic cards needed:" + epicRemainNum + "</td></tr>");
+		s.append("<tr><td>Upgrade epic cards coin needed:" + epicRemainGold + "</td></tr>");
+		s.append("<tr><td>Legendary cards :" + legendary + "</td><th>Level</th><th>Owned</th><th>Missing</th></tr>");
 		s.append(legCardsInfo);
-		s.append("legendary number:" + legCurNum + "<br/>");
-		s.append("legendary extra number:" + legRemainNum + "<br/>");
-		s.append("legendary extra gold:" + legRemainGold + "<br/>");
-		s.append("total card number:" + totalNum + "<br/>");
-		s.append("total extra card number:" + totalRemainNum + "<br/>");
-		s.append("total extra gold:" + totalRemainGold + "<br/>");
-		s.append("total extra Exp:" + totalRemainExp + "<br/>");
+		s.append("<tr><td>Legendary cards number:" + legCurNum + "</td></tr>");
+		s.append("<tr><td>Legendary cards needed:" + legRemainNum + "</td></tr>");
+		s.append("<tr><td>Upgrade legendary cards coin needed:" + legRemainGold + "</td></tr>");
+		s.append("<tr><td>Total card number:" + totalNum + "</td></tr>");
+		s.append("<tr><td>Total cards needed:" + totalRemainNum + "</td></tr>");
+		s.append("<tr><td>Total coin needed:" + totalRemainGold + "</td></tr>");
 	    return s.toString();
 	}
 
